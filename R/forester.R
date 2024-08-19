@@ -331,7 +331,7 @@ forester <- function(left_side_data,
           panel.grid.minor = ggplot2::element_blank(),
           legend.background = ggplot2::element_rect(fill = "transparent"),
           legend.box.background = ggplot2::element_rect(fill = "transparent")) +
-    ggplot2::theme(legend.position="bottom",legend.justification = "right")+
+    theme(legend.position = "none")+
     ggplot2::geom_vline(xintercept = null_line_at, linetype = "dashed") +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
     ggplot2::scale_shape_identity() +
@@ -461,6 +461,23 @@ forester <- function(left_side_data,
                              right = ((ggplot_width + left_width)/total_width),
                              top = 1,
                              bottom = 0.35/nrow(gdata))
+
+
+    ### color options ###
+    if (is.null(color)){
+      final
+    }else{
+      png_height <- (nrow(gdata) + 6)/3.8
+
+      final <- patchwork::wrap_elements(table_final) +
+        patchwork::inset_element(center,
+                                 align_to = "full",
+                                 left = (left_width/total_width),
+                                 right = ((ggplot_width + left_width)/total_width),
+                                 top = 0.97,
+                                 bottom = 0) +
+        patchwork::plot_layout(guides = "auto") & theme(legend.position="bottom",legend.justification = "right")
+    }
 
     if (arrows == TRUE) {
       final <- final + patchwork::inset_element(arrows_plot,
