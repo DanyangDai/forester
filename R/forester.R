@@ -37,6 +37,7 @@
 #' @param lower_header_row Logical. If TRUE, drops the header down one row (In the table rather than above it, like the default value (FALSE))
 #' @param render_as String or Function. What output format should be used? Option is passed to ggplot2::ggsave() as the argument "device". Either pass a device function (e.g. png) or one of "eps", "ps", "tex" (pictex), "pdf", "jpeg", "tiff", "png", "bmp", "svg" or "wmf" (windows only).
 #' @param table_theme A gridExtra table theme. If specified, overwrites all table theme customization in other options. The default is a modified version of ttheme_minimal.
+#' @param color. Variable that can be used to specify the color of the geom_points and error bars in the forest plot.
 #'
 #' @return image
 #' @importFrom rlang .data
@@ -79,7 +80,8 @@ forester <- function(left_side_data,
                     center_ggplot = NULL,
                     lower_header_row = FALSE,
                     render_as = "png",
-                    table_theme = NULL){
+                    table_theme = NULL,
+                    color = NULL){
 
   if (!length(justify) == 1) {
     justify <- c(justify[1:(length(justify) - 1)], 0, justify[length(justify)])
@@ -309,10 +311,11 @@ forester <- function(left_side_data,
   ########## the main figure - this will be overlaid on the table ##############
 
   center <- ggplot2::ggplot() +
-    ggplot2::geom_point(data = gdata, ggplot2::aes(y = row_num, x = estimate, size = sizes, shape = shape), na.rm = TRUE) +
+    ggplot2::geom_point(data = gdata, ggplot2::aes(y = row_num, x = estimate, size = sizes, shape = shape, color = color), na.rm = TRUE) +
     ggplot2::geom_errorbarh(data = gdata, ggplot2::aes(y = row_num,
           xmin = ci_low,
-          xmax = ci_high),
+          xmax = ci_high,
+          color = color),
           height = .25,
           na.rm = TRUE) +
     ggplot2::theme_classic() + # base theme
@@ -328,6 +331,7 @@ forester <- function(left_side_data,
           panel.grid.minor = ggplot2::element_blank(),
           legend.background = ggplot2::element_rect(fill = "transparent"),
           legend.box.background = ggplot2::element_rect(fill = "transparent")) +
+    ggplot2::theme(legend.position="bottom",legend.justification = "right")+
     ggplot2::geom_vline(xintercept = null_line_at, linetype = "dashed") +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
     ggplot2::scale_shape_identity() +
